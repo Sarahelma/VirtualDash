@@ -9,3 +9,4 @@ cell_volts = np.random.uniform(low=3.2, high=4.2, size=(16, 7))
 cell_temp = np.random.uniform(low=20, high=45, size=(16, 7))
 dti_temp = {'motor': 0, 'inverter': 0}
 speed = 50
+pps_counter = 0

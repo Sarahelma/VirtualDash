@@ -11,7 +11,9 @@ class DashGUI:
         self.root.title("Dash GUI")
         self.root.configure(bg='black')
         self.setup_notebook()
-
+        style = ttk.Style()
+        style.configure('TNotebook.Tab', padding=[30, 10])  # [width, height]
+        
     def setup_notebook(self):
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(expand=True, fill='both')

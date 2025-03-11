@@ -127,109 +127,89 @@ def create_battery_current_graph(frame):
     canvas.draw()
     canvas.get_tk_widget().pack(expand=True, fill='both')
 
-def create_motor_params_graph(frame):
-    """Create a graph for motor parameters (ERPM, duty cycle, input voltage)"""
-    fig, ax = plt.subplots(figsize=(8, 4))
-    fig.patch.set_facecolor('black')
-    ax.set_facecolor('black')
-    
-    time_data = np.linspace(0, 10, 100)
-    # Generate placeholder data
-    erpm_data = 3000 * np.sin(time_data) + 4000  # Oscillating ERPM
-    duty_data = 50 + 40 * np.sin(time_data * 0.5)  # Duty cycle 10-90%
-    voltage_data = 48 + 5 * np.cos(time_data * 2)  # Input voltage ~48V
-    
-    # Create line plots with different colors
-    ax.plot(time_data, erpm_data, color='red', linewidth=2, label='ERPM')
-    ax.plot(time_data, duty_data, color='cyan', linewidth=2, label='Duty Cycle (%)')
-    ax.plot(time_data, voltage_data, color='yellow', linewidth=2, label='Input Voltage (V)')
-    
-    # Styling
-    ax.set_title('Motor Parameters', color='white', pad=10)
-    ax.set_xlabel('Time (s)', color='white')
-    ax.set_ylabel('Value', color='white')
-    ax.tick_params(colors='white')
-    ax.grid(True, color='grey', alpha=0.3)
-    ax.legend(facecolor='black', edgecolor='white', labelcolor='white')
-    
-    for spine in ax.spines.values():
-        spine.set_color('white')
-    
-    plt.tight_layout()
-    canvas = FigureCanvasTkAgg(fig, master=frame)
-    canvas.draw()
-    canvas.get_tk_widget().pack(expand=True, fill='both')
 
-def create_current_graph(frame):
-    """Create a graph for AC and DC current measurements"""
-    fig, ax = plt.subplots(figsize=(8, 4))
+
+def create_ac_current_graph(frame):
+    fig, ax = plt.subplots(figsize=(16, 2))  # Wider but shorter for row layout
     fig.patch.set_facecolor('black')
     ax.set_facecolor('black')
     
+    # Sample data
     time_data = np.linspace(0, 10, 100)
-    # Generate placeholder data
-    ac_current = 100 * np.sin(time_data * 2)  # AC current ±100A
-    dc_current = 50 + 30 * np.sin(time_data)  # DC current 20-80A
+    current_data = 100 * np.sin(time_data * 2)  # Simulated AC current
     
-    # Create line plots
-    ax.plot(time_data, ac_current, color='magenta', linewidth=2, label='AC Current (A)')
-    ax.plot(time_data, dc_current, color='green', linewidth=2, label='DC Current (A)')
-    
-    # Styling
-    ax.set_title('Current Measurements', color='white', pad=10)
-    ax.set_xlabel('Time (s)', color='white')
+    ax.plot(time_data, current_data, color='cyan', linewidth=2)
+    ax.set_title('AC Current', color='white', pad=10)
     ax.set_ylabel('Current (A)', color='white')
-    ax.tick_params(colors='white')
-    ax.grid(True, color='grey', alpha=0.3)
-    ax.legend(facecolor='black', edgecolor='white', labelcolor='white')
+    ax.grid(True, color='gray', alpha=0.3)
     
     for spine in ax.spines.values():
         spine.set_color('white')
+    ax.tick_params(colors='white')
     
-    plt.tight_layout()
     canvas = FigureCanvasTkAgg(fig, master=frame)
     canvas.draw()
     canvas.get_tk_widget().pack(expand=True, fill='both')
 
-def create_vehicle_dynamics_graph(frame):
-    """Create a graph for vehicle dynamics parameters"""
-    fig, ax = plt.subplots(figsize=(8, 4))
+def create_dc_current_graph(frame):
+    fig, ax = plt.subplots(figsize=(16, 2))
     fig.patch.set_facecolor('black')
     ax.set_facecolor('black')
     
     time_data = np.linspace(0, 10, 100)
-    # Generate placeholder data
-    speed = 60 + 20 * np.sin(time_data * 0.5)  # Speed 40-80 mph
-    acceleration = 5 * np.cos(time_data * 0.5)  # Acceleration ±5 m/s²
+    current_data = 50 + 10 * np.sin(time_data * 0.5)  # Simulated DC current
     
-    # Create twin axis for different scales
-    ax2 = ax.twinx()
-    
-    # Plot speed and acceleration
-    line1 = ax.plot(time_data, speed, color='cyan', linewidth=2, label='Speed (mph)')
-    line2 = ax2.plot(time_data, acceleration, color='orange', linewidth=2, label='Acceleration (m/s²)')
-    
-    # Styling
-    ax.set_title('Vehicle Dynamics', color='white', pad=10)
-    ax.set_xlabel('Time (s)', color='white')
-    ax.set_ylabel('Speed (mph)', color='white')
-    ax2.set_ylabel('Acceleration (m/s²)', color='white')
-    
-    ax.tick_params(colors='white')
-    ax2.tick_params(colors='white')
-    ax.grid(True, color='grey', alpha=0.3)
-    
-    # Combine legends
-    lines = line1 + line2
-    labels = [l.get_label() for l in lines]
-    ax.legend(lines, labels, facecolor='black', edgecolor='white', labelcolor='white')
+    ax.plot(time_data, current_data, color='magenta', linewidth=2)
+    ax.set_title('DC Current', color='white', pad=10)
+    ax.set_ylabel('Current (A)', color='white')
+    ax.grid(True, color='gray', alpha=0.3)
     
     for spine in ax.spines.values():
         spine.set_color('white')
-    for spine in ax2.spines.values():
-        spine.set_color('white')
+    ax.tick_params(colors='white')
     
-    plt.tight_layout()
+    canvas = FigureCanvasTkAgg(fig, master=frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack(expand=True, fill='both')
+
+def create_voltage_graph(frame):
+    fig, ax = plt.subplots(figsize=(16, 2))
+    fig.patch.set_facecolor('black')
+    ax.set_facecolor('black')
+    
+    time_data = np.linspace(0, 10, 100)
+    voltage_data = 48 + 2 * np.sin(time_data)  # Simulated voltage
+    
+    ax.plot(time_data, voltage_data, color='yellow', linewidth=2)
+    ax.set_title('Voltage', color='white', pad=10)
+    ax.set_ylabel('Voltage (V)', color='white')
+    ax.grid(True, color='gray', alpha=0.3)
+    
+    for spine in ax.spines.values():
+        spine.set_color('white')
+    ax.tick_params(colors='white')
+    
+    canvas = FigureCanvasTkAgg(fig, master=frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack(expand=True, fill='both')
+
+def create_duty_cycle_graph(frame):
+    fig, ax = plt.subplots(figsize=(16, 2))
+    fig.patch.set_facecolor('black')
+    ax.set_facecolor('black')
+    
+    time_data = np.linspace(0, 10, 100)
+    duty_data = 50 + 40 * np.sin(time_data * 0.3)  # Simulated duty cycle
+    
+    ax.plot(time_data, duty_data, color='green', linewidth=2)
+    ax.set_title('Duty Cycle', color='white', pad=10)
+    ax.set_ylabel('Duty Cycle (%)', color='white')
+    ax.grid(True, color='gray', alpha=0.3)
+    
+    for spine in ax.spines.values():
+        spine.set_color('white')
+    ax.tick_params(colors='white')
+    
     canvas = FigureCanvasTkAgg(fig, master=frame)
     canvas.draw()
     canvas.get_tk_widget().pack(expand=True, fill='both')
