@@ -1,6 +1,9 @@
 # VirtualDash
 A simple modular Tkinter application to display live vehicle telemetry data arriving via serial port. Designed to be used with Manchester Stringer Motorsports electric vehicle
 
+![Mainpage](./image.png)
+
+
 Serial data should print to serial port in hexadecimal in the following format:
 ```
 Timestamp (4 bytes)  CANID(4 bytes)  Data(8 bytes)
