@@ -1,14 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
-from components.graphs import draw_heatmap, create_battery_voltage_graph, create_battery_current_graph
+from archive.graphs import draw_heatmap, create_battery_voltage_graph, create_battery_current_graph
 from components.flags import draw_flags_with_header
 from data import dti_temp, inverter_flags, battery_flags, IMD_flags, cell_volts, cell_temp  # Add imports
 
 class BatteryPage:
-    def __init__(self, notebook):
+    def __init__(self, notebook, processor):
         # Create the frame first
         self.frame = ttk.Frame(notebook)
         self.frame.configure(style='Black.TFrame')
+        self.processor = processor  # Store processor instance
         
         # Initialize data attributes
         self.inverter_flags = inverter_flags

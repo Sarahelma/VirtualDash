@@ -4,10 +4,11 @@ from components.flags import draw_flags_with_header
 from data import dti_temp, inverter_flags, battery_flags, IMD_flags  # Add imports
 
 class VehiclePage:
-    def __init__(self, notebook):
+    def __init__(self, notebook,processor):
         # Create the frame first
         self.frame = ttk.Frame(notebook)
         self.frame.configure(style='Black.TFrame')
+        self.processor = processor
         
         # Initialize flags
         self.inverter_flags = inverter_flags

@@ -1,6 +1,7 @@
 from tkdial import Meter
 from tkinter import ttk
 from data import dti_temp, battery_pack
+
 def create_motor_temp_gauge(frame):
     motor_temp_label = ttk.Label(
         frame,
@@ -14,7 +15,7 @@ def create_motor_temp_gauge(frame):
         frame, 
         radius=440, 
         start=0, 
-        end=100,
+        end=150,
         border_width=0,
         fg="black", 
         text_color="white", 
@@ -25,11 +26,12 @@ def create_motor_temp_gauge(frame):
         needle_color="red",
         scroll=False
         )
-    motor_temp_meter.set_mark(0, 25, "#92d050")
-    motor_temp_meter.set_mark(25, 40, "#FFA500")
-    motor_temp_meter.set_mark(40, 100, "#FF0000")
-    motor_temp_meter.set(dti_temp['motor'])
+    motor_temp_meter.set_mark(0, 85, "#92d050")
+    motor_temp_meter.set_mark(85, 110, "#FFA500")
+    motor_temp_meter.set_mark(110, 150, "#FF0000")
+    motor_temp_meter.set(0)  # Initialize to 0 instead of static value
     motor_temp_meter.pack(expand=True, fill='both')
+    return motor_temp_meter  # Return the meter object
 
 def create_battery_temp_gauge(frame):
     battery_temp_label = ttk.Label(
@@ -40,12 +42,15 @@ def create_battery_temp_gauge(frame):
     background="black"
     )
     battery_temp_label.pack(pady=5)
-    battery_temp_meter = Meter(frame, radius=440, start=0, end=100, border_width=0, fg="black", text_color="white", start_angle=225, end_angle=-270, text_font="DS-Digital 30", scale_color="white", needle_color="red", scroll=False)
+    battery_temp_meter = Meter(frame, radius=440, start=0, end=100, border_width=0, fg="black", text_color="white", 
+                               start_angle=225, end_angle=-270, text_font="DS-Digital 30", 
+                               scale_color="white", needle_color="red", scroll=False)
     battery_temp_meter.set_mark(0, 25, "#92d050")
     battery_temp_meter.set_mark(25, 40, "#FFA500")
     battery_temp_meter.set_mark(40, 100, "#FF0000")
-    battery_temp_meter.set(battery_pack['temp'])
+    battery_temp_meter.set(0)  # Initialize to 0 instead of static value
     battery_temp_meter.pack(expand=True, fill='both')
+    return battery_temp_meter  # Return the meter object
 
 def create_speedometer(frame):
     speed_label = ttk.Label(
@@ -96,7 +101,7 @@ def create_voltmeter(frame):
         frame, 
         radius=420,
         start=0, 
-        end=470,
+        end=500,
         border_width=0,
         fg="black", 
         text_color="white",
@@ -110,9 +115,11 @@ def create_voltmeter(frame):
     )
     
     # Set color ranges
-    voltmeter.set_mark(0, 380, "#FF0000")     # Red below 380V
-    voltmeter.set_mark(380, 390, "#FFA500")   # Orange 380-390V
-    voltmeter.set_mark(390, 470, "#92d050")   # Green above 390V
+    voltmeter.set_mark(0, 100, "#FF0000")     # Red below 380V
+    voltmeter.set_mark(100, 380, "#FFA500")   # Orange 380-390V
+    voltmeter.set_mark(380, 420, "#92d050")   # Green above 390V
+    voltmeter.set_mark(420, 470, "#FFA500")   # Orange 380-390V
+    voltmeter.set_mark(470, 500, "#FF0000")     # Red below 380V
     
     voltmeter.pack(expand=True, fill='both')
     return voltmeter

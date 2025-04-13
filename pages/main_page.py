@@ -1,23 +1,32 @@
 import tkinter as tk
 from tkinter import ttk
-from components.graphs import create_rpm_graph
+from components.dbc_graphs import create_erpm_graph
 from components.gauges import create_motor_temp_gauge, create_battery_temp_gauge, create_speedometer, create_voltmeter
 from components.flags import draw_flags_with_header
-from data import dti_temp, inverter_flags, battery_flags, IMD_flags  # Add imports
+from data import battery_flags, IMD_flags
 
 class MainPage:
-    def __init__(self, notebook):
-        # Create the frame first
+    def __init__(self, notebook, processor):
+
         self.frame = ttk.Frame(notebook)
         self.frame.configure(style='Black.TFrame')
         
-        # Initialize flags
-        self.inverter_flags = inverter_flags
-        self.battery_flags = battery_flags
-        self.IMD_flags = IMD_flags
+
+        self.processor = processor
         
+
+        self.inverter_flags = processor.inverter_flags
+        self.battery_flags = processor.battery_flags
+        self.IMD_flags = processor.imd_flags
+        
+ 
+        self.gauges = {}
+        
+        # Setup conversion for ERPM to KPH
+        self.erpm_to_kph = lambda erpm: (erpm / (10 * 3.9 )) * 45.72 * 3.1416 * 60 / 160934.4
         self.setup_layout()
         self.setup_components()
+        self.setup_gauge_updates()
 
     def setup_layout(self):
         self.frame.grid_rowconfigure(0, weight=1, minsize=30)
@@ -47,11 +56,53 @@ class MainPage:
         self.main_rect5 = tk.Frame(self.frame, relief='solid', borderwidth=1, bg='grey')
         self.main_rect5.grid(row=2, column=3, sticky='nsew')
 
-        # Add components
-        create_rpm_graph(self.main_rect1)
-        create_motor_temp_gauge(self.main_rect2)
-        create_battery_temp_gauge(self.main_rect3)
-        create_speedometer(self.main_rect4)
-        create_voltmeter(self.main_rect5)
-        draw_flags_with_header(self.main_top_strip, self.inverter_flags + self.battery_flags + self.IMD_flags,
-                               ['red'] * len(self.inverter_flags) + ['#0000FF'] * len(self.battery_flags) + ['#FFFF00'] * len(self.IMD_flags))
+        # Add components with processor instance
+        create_erpm_graph(self.main_rect1, self.processor)  # Use DBC-based ERPM graph 
+        
+        # Store references to the gauge objects
+        self.gauges['motor_temp'] = create_motor_temp_gauge(self.main_rect2)
+        self.gauges['battery_temp'] = create_battery_temp_gauge(self.main_rect3)
+        self.gauges['speed'] = create_speedometer(self.main_rect4)
+        self.gauges['voltage'] = create_voltmeter(self.main_rect5)
+        
+        draw_flags_with_header(self.main_top_strip, 
+                             self.inverter_flags + self.battery_flags + self.IMD_flags,
+                             ['red'] * len(self.inverter_flags) + 
+                             ['#0000FF'] * len(self.battery_flags) + 
+                             ['#FFFF00'] * len(self.IMD_flags),
+                             self.processor)
+
+    def setup_gauge_updates(self):
+        """Setup periodic updates for gauges from DBC data"""
+        
+        def update_gauges():
+            # Update Motor Temperature from DBC data
+            _, motor_temp_values = self.processor.get_signal_data('Actual_TempMotor')
+            if motor_temp_values:
+                # Get the latest value
+                motor_temp = motor_temp_values[-1]
+                # Update the gauge
+                self.gauges['motor_temp'].set(motor_temp)
+                
+            # Update Voltage from DBC data
+            _, voltage_values = self.processor.get_signal_data('Actual_InputVoltage') 
+            if voltage_values:
+                # Get the latest value
+                voltage = voltage_values[-1]
+                # Update the gauge
+                self.gauges['voltage'].set(voltage)
+                
+            # Update Speed based on ERPM
+            _, erpm_values = self.processor.get_signal_data('Actual_ERPM')
+            if erpm_values:
+                # Convert ERPM to KPH
+                erpm = erpm_values[-1]
+                speed_kph = self.erpm_to_kph(erpm)
+                # Update the gauge
+                self.gauges['speed'].set(speed_kph)
+                
+            # Schedule the next update
+            self.frame.after(250, update_gauges)  # Update 4 times per second
+            
+        # Start the update loop
+        self.frame.after(250, update_gauges)
