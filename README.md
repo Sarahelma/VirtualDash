@@ -33,7 +33,7 @@ This project uses the following libraries:
 - [tkdial](https://github.com/Akascape/tkdial) - For analog gauges
 
 
-<<<<<<< HEAD
+
 ## References and Libraries:
 This project uses the following libraries:
 - [Matplotlib](https://matplotlib.org/) - For data visualization and custom UI elements
@@ -45,7 +45,4 @@ This project uses the following libraries:
 
 Disclaimer:
 This tool was developed with the assistance of Github Co-Pilot Claude 3.5 Sonnet and later Claude 3.7 Sonnet by Anthropic. Github Copilot was used to generate code, debug errors, integrate working examples into the program, suggest changes and auto-complete lines. 
-=======
-Disclaimer:
-This tool was developed with the assistance of Github Co-Pilot Claude 3.5 Sonnet and later Claude 3.7 Sonnet by Anthropic. Github Copilot was used to generate code, debug errors, integrate working examples into the program, suggest changes and auto-complete lines. 
->>>>>>> 461117448f1226a4fd23b23f755896ee70f141c6
+
