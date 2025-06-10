@@ -29,7 +29,7 @@ def create_motor_temp_gauge(frame):
     motor_temp_meter.set_mark(0, 85, "#92d050")
     motor_temp_meter.set_mark(85, 110, "#FFA500")
     motor_temp_meter.set_mark(110, 150, "#FF0000")
-    motor_temp_meter.set(0)  # Initialize to 0 instead of static value
+    motor_temp_meter.set(0)  # Initialize to 0 
     motor_temp_meter.pack(expand=True, fill='both')
     return motor_temp_meter  # Return the meter object
 
@@ -48,7 +48,7 @@ def create_battery_temp_gauge(frame):
     battery_temp_meter.set_mark(0, 25, "#92d050")
     battery_temp_meter.set_mark(25, 40, "#FFA500")
     battery_temp_meter.set_mark(40, 100, "#FF0000")
-    battery_temp_meter.set(0)  # Initialize to 0 instead of static value
+    battery_temp_meter.set(0)  # Initialize to 0 
     battery_temp_meter.pack(expand=True, fill='both')
     return battery_temp_meter  # Return the meter object
 

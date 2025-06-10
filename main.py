@@ -14,7 +14,7 @@ def on_closing():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Telemetry Dashboard with DBC parsing')
-    parser.add_argument('--dbc', default="hv500_can2_map_v24_EID_custom.dbc", 
+    parser.add_argument('--dbc', default="bms_can_database.dbc", 
                       help='Path to DBC file')
     parser.add_argument('--port', default="COM8", 
                       help='Serial port to use')
@@ -26,8 +26,7 @@ if __name__ == "__main__":
         root = tk.Tk()
         root.protocol("WM_DELETE_WINDOW", on_closing)
         app = DashGUI(root, processor)
-        
-        # Start processing flag updates in main thread
+    
         root.after(100, processor.process_flag_updates, root)
         
         root.mainloop()

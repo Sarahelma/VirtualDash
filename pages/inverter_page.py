@@ -6,14 +6,13 @@ from data import battery_flags, IMD_flags
 
 class InverterPage:
     def __init__(self, notebook, processor):
-        # Create the frame first
+
         self.frame = ttk.Frame(notebook)
         self.frame.configure(style='Black.TFrame')
         
-        # Store processor instance
+
         self.processor = processor
-        
-        # Use inverter flags from processor
+ 
         self.inverter_flags = processor.inverter_flags
         self.battery_flags = battery_flags
         self.IMD_flags = IMD_flags
@@ -45,15 +44,14 @@ class InverterPage:
         self.duty_cycle_frame = ttk.Frame(self.frame, relief='solid', borderwidth=1)
         self.duty_cycle_frame.grid(row=4, column=0, sticky='nsew')
 
-        # Add components - now using DBC-based graphs
         draw_flags_with_header(self.inverter_top_strip, 
                              self.inverter_flags + self.battery_flags + self.IMD_flags,
                              ['red'] * len(self.inverter_flags) + 
                              ['#0000FF'] * len(self.battery_flags) + 
                              ['#FFFF00'] * len(self.IMD_flags),
-                             self.processor)  # Pass processor for dynamic updates
+                             self.processor)  
                              
-        # Use DBC-based graphs with processor instance
+
         create_ac_current_graph(self.ac_current_frame, self.processor)
         create_dc_current_graph(self.dc_current_frame, self.processor)
         create_voltage_graph(self.voltage_frame, self.processor)

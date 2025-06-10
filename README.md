@@ -15,4 +15,14 @@ The following ID's have been incorparated and parsed based on DTI HV500 motor co
 Any additional IDs should be added to the DBC file, to modify the interface to display additiona
 
 
-This tool was developed with the assistance of Github Co-Pilot Claude 3.5 Sonnet.
+## References and Libraries:
+This project uses the following libraries:
+- [Matplotlib](https://matplotlib.org/) - For data visualization and custom UI elements
+- [Tkinter](https://docs.python.org/3/library/tkinter.html) - For GUI implementation
+- [cantools](https://github.com/cantools/cantools) - For CAN DBC file parsing
+- [pyserial](https://github.com/pyserial/pyserial) - For serial communication
+- [tkdial](https://github.com/Akascape/tkdial) - For analog gauges
+
+
+Disclaimer:
+This tool was developed with the assistance of Github Co-Pilot Claude 3.5 Sonnet and later Claude 3.7 Sonnet by Anthropic. Github Copilot was used to generate code, debug errors, integrate working examples into the program, suggest changes and auto-complete lines. 

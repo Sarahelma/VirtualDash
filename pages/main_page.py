@@ -56,10 +56,9 @@ class MainPage:
         self.main_rect5 = tk.Frame(self.frame, relief='solid', borderwidth=1, bg='grey')
         self.main_rect5.grid(row=2, column=3, sticky='nsew')
 
-        # Add components with processor instance
-        create_erpm_graph(self.main_rect1, self.processor)  # Use DBC-based ERPM graph 
-        
-        # Store references to the gauge objects
+
+        create_erpm_graph(self.main_rect1, self.processor)  
+
         self.gauges['motor_temp'] = create_motor_temp_gauge(self.main_rect2)
         self.gauges['battery_temp'] = create_battery_temp_gauge(self.main_rect3)
         self.gauges['speed'] = create_speedometer(self.main_rect4)
@@ -76,33 +75,25 @@ class MainPage:
         """Setup periodic updates for gauges from DBC data"""
         
         def update_gauges():
-            # Update Motor Temperature from DBC data
+
             _, motor_temp_values = self.processor.get_signal_data('Actual_TempMotor')
             if motor_temp_values:
-                # Get the latest value
+
                 motor_temp = motor_temp_values[-1]
-                # Update the gauge
                 self.gauges['motor_temp'].set(motor_temp)
-                
-            # Update Voltage from DBC data
+            
             _, voltage_values = self.processor.get_signal_data('Actual_InputVoltage') 
             if voltage_values:
-                # Get the latest value
                 voltage = voltage_values[-1]
-                # Update the gauge
                 self.gauges['voltage'].set(voltage)
-                
-            # Update Speed based on ERPM
+
             _, erpm_values = self.processor.get_signal_data('Actual_ERPM')
             if erpm_values:
-                # Convert ERPM to KPH
                 erpm = erpm_values[-1]
                 speed_kph = self.erpm_to_kph(erpm)
-                # Update the gauge
                 self.gauges['speed'].set(speed_kph)
                 
-            # Schedule the next update
+
             self.frame.after(250, update_gauges)  # Update 4 times per second
             
-        # Start the update loop
         self.frame.after(250, update_gauges)

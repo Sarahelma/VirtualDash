@@ -18,7 +18,7 @@ class SerialReaderProtocolLine(LineReader):
             self.data_listener.on_data(line.strip())
 
 class DBCProcessor:
-    def __init__(self, port="COM8", baud=115200, dbc_path="hv500_can2_map_v24_EID_custom.dbc"):
+    def __init__(self, port="COM8", baud=115200, dbc_path="bms_can_database.dbc"):
         print("Initializing DBC Processor...")
         # Load DBC file
         try:
@@ -33,7 +33,6 @@ class DBCProcessor:
         self.timestamps = {}
         self.values = {}
         
-        # For thread safety - use a queue for flag updates
         self.flag_update_queue = queue.Queue()
         
 
@@ -94,6 +93,10 @@ class DBCProcessor:
             print(f"Serial connection failed: {e}")
             raise
 
+        self.expected_interval = 20  # Expected time between samples in ms
+        self.last_timestamps = {}    # Track last timestamp per signal
+        self.debug_logging = True    # Enable/disable debug logging
+
     def __del__(self):
         if hasattr(self, 'reader_thread'):
             self.reader_thread.stop()
@@ -121,6 +124,9 @@ class DBCProcessor:
             try:
                 message = self.db.get_message_by_frame_id(can_id)
                 if not message:
+                    available_ids = [msg.frame_id for msg in self.db.messages[:5]]  # First 5
+                    print(f"No message found for CAN ID: 0x{can_id:08X}")
+                    print(f"Available message IDs: {[hex(id) for id in available_ids]}")
                     return
 
                 data_bytes = bytes([int(b, 16) for b in parts[2:]])
@@ -129,11 +135,11 @@ class DBCProcessor:
             
                 if 'Actual_FaultCode' in decoded:
                     fault_code = int(decoded['Actual_FaultCode'])
-                    # Queue the flag update instead of calling directly
                     self.flag_update_queue.put(("inverter", fault_code))
     
                 for signal_name, value in decoded.items():
-                    self.timestamps[signal_name].append(timestamp)
+                    validated_timestamp = self.validate_timestamp(signal_name, timestamp)
+                    self.timestamps[signal_name].append(validated_timestamp)
                     self.values[signal_name].append(value)
                     
             except cantools.database.errors.DecodeError:
@@ -143,19 +149,17 @@ class DBCProcessor:
             print(f"Data parsing error: {e}")
 
     def update_inverter_flags(self, fault_code):
-        """Update inverter flags based on fault code"""
         for i in range(len(self.inverter_flags)):
             self.inverter_flags[i] = (self.inverter_flags[i][0], 0)
         
         # Set flags based on fault code
-        if fault_code != 0:  # If fault code is not 0 (no fault)
+        if fault_code != 0:  
             if 1 <= fault_code <= len(self.inverter_flags):
                 # Set the specific flag
                 flag_name, _ = self.inverter_flags[fault_code-1]  # Adjust for 0-indexing
                 self.inverter_flags[fault_code-1] = (flag_name, 1)
     
     def process_flag_updates(self, root):
-        """Process flag updates from the queue in the main thread"""
         try:
             while not self.flag_update_queue.empty():
                 flag_type, code = self.flag_update_queue.get_nowait()
@@ -170,35 +174,43 @@ class DBCProcessor:
             root.after(100, self.process_flag_updates, root)
     
     def register_flag_callback(self, callback):
-        """Register a callback function to be called when flags change"""
         self.flag_callbacks.append(callback)
     
     def get_inverter_flags(self):
-        """Return current inverter flags"""
         return self.inverter_flags
         
     def update_battery_flags(self, flags_byte):
-        """Update battery flags based on status byte"""
         pass
 
     def update_imd_flags(self, flags_byte):
-        """Update IMD flags based on status byte"""
         pass
 
     def register_battery_flag_callback(self, callback):
-        """Register a callback function to be called when battery flags change"""
         self.battery_flag_callbacks.append(callback)
 
     def register_imd_flag_callback(self, callback):
-        """Register a callback function to be called when IMD flags change"""
         self.imd_flag_callbacks.append(callback)
     
     def get_signal_data(self, signal_name):
-        """Get timestamp and value data for a specific signal"""
         if signal_name in self.timestamps:
             return list(self.timestamps[signal_name]), list(self.values[signal_name])
         return [], []
     
     def get_pps(self):
-        """Return the current packets per second rate"""
         return self.packets_per_second
+
+    def validate_timestamp(self, signal_name, new_timestamp):
+        if signal_name not in self.last_timestamps:
+            self.last_timestamps[signal_name] = new_timestamp
+            return new_timestamp
+        
+        time_diff = new_timestamp - self.last_timestamps[signal_name]
+        
+        if time_diff > 1000:  # Gap larger than 1 second
+            if self.debug_logging:
+                print(f"Large timestamp gap detected: {time_diff}ms for {signal_name}")
+            # Use expected interval instead
+            new_timestamp = self.last_timestamps[signal_name] + self.expected_interval
+        
+        self.last_timestamps[signal_name] = new_timestamp
+        return new_timestamp

@@ -47,38 +47,36 @@ def draw_flags_with_header(frame, flags, colors, processor=None):
                          style='White.TLabel')
     pps_value.pack()
     
-    # Update PPS if processor is available - now with faster refresh
+
     if processor:
         def update_pps():
-            # Only update if processor has the method
             if hasattr(processor, 'get_pps'):
                 try:
                     pps = processor.get_pps()
-                    pps_value.configure(text=str(pps))
+                    pps_value.configure(text=f"{pps:03d}")
                 except:
                     pass  # Ignore errors
             # Update 4 times per second (250ms)
             container.after(250, update_pps)
-        
-        # Start the update loop
+
         container.after(250, update_pps)
 
-    # Flags frame
+
     flags_frame = ttk.Frame(container, style='Black.TFrame')
     flags_frame.grid(row=0, column=3, sticky='nsew', padx=5)
 
-    # Create figure for flags
+
     fig, ax = plt.subplots(figsize=(12, 0.8))
     fig.patch.set_facecolor('black')
     ax.set_facecolor('black')
 
-    # Calculate spacing and create empty triangle objects
+
     spacing = 3.6
     triangles = []
     labels = []
     exclams = []
 
-    # Initial draw of flags
+
     for i, (flag, color) in enumerate(zip(flags, colors)):
         tri, excl, lbl = flags_icon(ax, i * spacing, color, flag[0], flag[1] == 1)
         triangles.append(tri)
@@ -96,7 +94,7 @@ def draw_flags_with_header(frame, flags, colors, processor=None):
     canvas.draw()
     canvas.get_tk_widget().pack(expand=True, fill='both')
     
-    # Register callback to update flags if processor is available
+
     if processor:
         # Create a function that updates flags
         def update_all_flags():
